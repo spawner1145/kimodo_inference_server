@@ -41,7 +41,7 @@ class ServerConfig(BaseModel):
     host: str = '127.0.0.1'
     port: int = Field(default=6600, ge=1, le=65535)
     device: str = 'cuda'
-    models_dir: Path
+    models_dir: Path = Path('models')
     data_dir: Path = Path('data')
     default_model: str = 'soma-fp32'
     offload: bool = True

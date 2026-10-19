@@ -19,7 +19,7 @@ class NF4Tests(unittest.TestCase):
         from transformers import LlamaConfig,LlamaForCausalLM,BitsAndBytesConfig
         # Reuse local tokenizer vocabulary only. The model is random and tiny,
         # and makes no claim about motion generation quality.
-        tokenizer = Path(__file__).resolve().parents[2]/'models/text_encoders/LLM2Vec-Meta-Llama-3-8B-Instruct-mntp'
+        tokenizer = Path(__file__).resolve().parents[1]/'models/text_encoders/LLM2Vec-Meta-Llama-3-8B-Instruct-mntp'
         if not (tokenizer/'tokenizer.json').exists():
             self.skipTest('Local Llama tokenizer is not available')
         with tempfile.TemporaryDirectory() as directory:

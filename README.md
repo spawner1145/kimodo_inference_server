@@ -135,7 +135,21 @@ python -c "import torch, kimodo, kimodo_server; from kimodo_server.runtime impor
 
 ### 5. 配置模型并启动
 
-仓库提供 `config.example.json`；第一次启动时，若同目录没有 `config.json`，会自动复制示例生成本地配置，已有配置不会覆盖。默认配置使用相邻的 `../models` 存储模型，运行数据保存在 `data`。第一次使用时可启动服务，在 WebUI 的模型管理中下载权重，或编辑配置指向已有权重；缺少权重不影响打开面板，生成前才需要相应模型和编码器齐全。模型和编码器路径按 `models_dir` 解析。
+仓库提供 `config.example.json`；第一次启动时，若同目录没有 `config.json`，会自动复制示例生成本地配置，已有配置不会覆盖。默认配置使用服务端目录内的 `models/` 存储全部动作模型、文本编码器及其适配器，即 `kimodo_inference_server/models/`，运行数据保存在 `data`。第一次使用时可启动服务，在 WebUI 的模型管理中下载权重，或编辑配置指向已有权重；缺少权重不影响打开面板，生成前才需要相应模型和编码器齐全。模型和编码器路径按 `models_dir` 解析。
+
+默认模型目录结构（下载后创建对应子目录）：
+
+```text
+kimodo_inference_server/
+├─ models/
+│  ├─ Kimodo-SOMA-RP-v1.2/               FP32 / FP16 / BF16 共用原始权重
+│  ├─ Kimodo-SOMA-RP-v1.2-int8-convrot/  INT8 权重
+│  └─ text_encoders/                    AWQ / NF4 / BF16 编码器及适配器
+├─ data/                               运行缓存与生成结果
+└─ config.json
+```
+
+WebUI 和命令行下载均使用同一个 `models_dir`，模型加载也从这里读取；相对路径以配置文件所在目录为基准。`models/` 已被 `.gitignore` 排除。旧安装如曾使用 `../models`，需将对应权重子目录放到新的 `models/` 下；修改配置不会自动搬动权重。
 
 Windows 双击 **`start.bat`**；Linux / macOS 执行 **`sh start.sh`**。启动后打开 **http://127.0.0.1:6600/**，API 文档在 `/docs`，按 Ctrl+C 停止。启动脚本不安装依赖、不自动下载模型；已有服务运行时无需重复启动。
 
@@ -270,7 +284,7 @@ Blender 场景约束编辑器沿用 SOMA 关节映射；SMPLX/G1 可以生成、
 python -m kimodo_server self-test
 
 # 量化到一个新目录，不覆盖已有模型；之后在 config.json 中添加此路径
-python -m kimodo_server quantize --source ../models/Kimodo-SOMA-RP-v1.2 --output ../models/my-int8
+python -m kimodo_server quantize --source models/Kimodo-SOMA-RP-v1.2 --output models/my-int8
 
 # 同提示词、种子、采样设置生成完整动作，再比较 30 个实际预测关节
 python -m kimodo_server compare --config config.json --prompts "A person walks forward." --seeds 17 42 --duration 4 --steps 100 --output data/comparison.json
