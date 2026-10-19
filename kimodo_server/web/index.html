@@ -1,0 +1,51 @@
+<!doctype html>
+<html lang="zh-CN">
+<head>
+  <meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">
+  <meta name="color-scheme" content="dark"><title>Kimodo · 推理控制台</title>
+  <link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 40 40'%3E%3Crect width='40' height='40' rx='12' fill='%2379e1c4'/%3E%3Cpath d='M12 9v22m16-22L13 20l16 11' fill='none' stroke='%23101619' stroke-width='4'/%3E%3C/svg%3E">
+  <link rel="stylesheet" href="/ui/style.css"><script defer src="/ui/app.js"></script>
+</head>
+<body>
+<aside>
+  <a class="brand" href="/"><span class="logo">K</span><span>Kimodo<small>MOTION ENGINE</small></span></a>
+  <div class="nav-label">工作空间</div>
+  <nav aria-label="主导航">
+    <button class="selected" data-tab="overview"><span>◈</span>服务概览</button>
+    <button data-tab="models"><span>▦</span>模型管理 <b id="model-count">—</b></button>
+    <button data-tab="inference"><span>≋</span>推理配置</button>
+    <button data-tab="server"><span>⚙</span>服务设置</button>
+    <button data-tab="downloads"><span>↓</span>下载任务 <b id="download-count">0</b></button>
+  </nav>
+  <div class="sidebar-bottom"><span class="dot" id="connection-dot"></span><span id="connection-text">连接中</span><small id="version">Kimodo API</small><button class="text-button" id="auth-open">API 令牌</button></div>
+</aside>
+<main>
+  <header><div><div class="eyebrow">KIMODO / CONTROL CENTER</div><h1 id="page-title">服务概览</h1><p id="page-subtitle">让动作生成，在你的掌控之中。</p></div><div class="header-actions"><a href="/docs" target="_blank" rel="noopener" class="button secondary">API 文档 ↗</a><button id="refresh" class="secondary">↻ 刷新状态</button></div></header>
+  <div id="notice" class="notice" role="status" hidden></div>
+  <div class="config-bar"><span id="config-state">正在读取配置…</span><div><button class="secondary" id="save">保存配置</button><button id="apply">应用并重启 ↗</button></div></div>
+  <section id="overview" class="page">
+    <div class="stats"><article><span>服务状态</span><strong id="stat-status">—</strong><small id="stat-address">—</small></article><article><span>动作模型</span><strong id="stat-models">—</strong><small>本地就绪 / 已配置</small></article><article><span>文本编码器</span><strong id="stat-encoders">—</strong><small>AWQ · NF4 · BF16</small></article><article><span>运行中任务</span><strong id="stat-jobs">0</strong><small>单 GPU 顺序执行</small></article></div>
+    <div class="two-column"><article class="card hero"><div class="eyebrow">READY TO MOVE</div><h2>从文字，到动作。</h2><p>在 Blender 里编排创意，<br>在这里管理生成它的引擎。</p><div class="motion-lines" aria-hidden="true"><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i></div><button class="secondary" data-go="models">管理模型 →</button></article><article class="card"><div class="section-heading"><h2>当前运行配置</h2><span class="badge">ACTIVE</span></div><dl id="active-summary"></dl><p class="hint">Blender 插件连接此服务地址。更换端口后，请同步修改插件的 API 地址。</p></article></div>
+    <article class="card"><div class="section-heading"><h2>推理任务</h2><span class="muted">最近 32 条 · 每 2 秒更新</span></div><div id="inference-jobs" class="empty">暂无任务。在 Blender 中提交动作生成后，进度会显示在这里。</div></article>
+  </section>
+  <section id="models" class="page" hidden>
+    <div class="section-heading"><div><h2>动作模型</h2><p class="muted">选择默认模型，或连接已有权重。模型在首次推理时加载。</p></div><button class="secondary" id="add-model">＋ 添加模型</button></div><div id="model-list" class="model-grid"></div>
+    <div class="section-heading spaced"><div><h2>文本编码器</h2><p class="muted">NF4、AWQ 和完整精度 LLM2Vec，可独立设置 block swap。</p></div><button class="secondary" id="add-encoder">＋ 添加编码器</button></div><div id="encoder-list" class="model-grid"></div>
+  </section>
+  <section id="inference" class="page" hidden>
+    <article class="card"><div class="section-heading"><div><h2>默认生成参数</h2><p class="muted">应用后，对 API 请求中省略的参数生效。Blender 显式发送的参数优先。</p></div><span class="badge">SAMPLING</span></div><div class="form-grid" id="inference-fields"></div></article>
+    <article class="card"><h2>显存与计算</h2><p class="muted">Block swap 将部分 Transformer 块放在 CPU，通常省显存、增加延迟。</p><div class="form-grid" id="optimization-fields"></div></article>
+  </section>
+  <section id="server" class="page" hidden>
+    <article class="card"><div class="section-heading"><div><h2>连接与存储</h2><p class="muted">保存后点击“应用并重启”。新端口需在 Blender 中同步修改。</p></div><span class="badge">SERVER</span></div><div class="form-grid" id="server-fields"></div><p class="hint">非本机监听需要在启动环境中设置 KIMODO_API_TOKEN。配置文件中不保存令牌。</p></article>
+    <article class="card"><h2>队列与保留策略</h2><div class="form-grid" id="queue-fields"></div><p class="hint">重启释放已加载的模型并清空任务查询表；本地模型、文本特征缓存和生成文件保留。</p></article>
+  </section>
+  <section id="downloads" class="page" hidden>
+    <article class="card"><h2>下载源</h2><p class="muted">在模型管理中点击“下载”。下载源由每个模型/编码器的配置决定，支持 Hugging Face 和 ModelScope。仅在你发起下载后联网；未完成文件不会标记为就绪。</p><div class="form-grid"><label>Hugging Face 兼容端点<input id="download-endpoint" type="url" value="https://huggingface.co" placeholder="https://huggingface.co"><small>仅作用于 Hugging Face；ModelScope 使用官方站点</small></label><label>HF 访问令牌（可选）<input id="download-token" type="password" autocomplete="off" placeholder="仅用于下一次下载"><small>留空使用服务进程的 HF_TOKEN；页面不保存此令牌</small></label><label>ModelScope 访问令牌（可选）<input id="modelscope-token" type="password" autocomplete="off" placeholder="公开仓库无需填写"><small>留空使用 MODELSCOPE_API_TOKEN；与 HF 令牌分开，不写入配置</small></label></div><p class="hint">NF4、BF16 等完整权重可能有数 GB。受限仓库需要有访问权限的账号。不会自动下载 BF16 基座。</p></article>
+    <article class="card"><div class="section-heading"><h2>下载队列</h2><span class="muted">支持取消与再次续传</span></div><div id="download-list" class="empty">暂无下载任务</div></article>
+  </section>
+  <footer><span>Kimodo · 本地动作推理服务</span><span id="config-path"></span></footer>
+</main>
+<dialog id="profile-dialog"><form id="profile-form"><div class="section-heading"><h2 id="profile-title">编辑模型</h2><button type="button" class="icon-button" id="profile-close" aria-label="关闭">×</button></div><div id="profile-fields" class="form-grid"></div><p class="hint">相对路径以模型根目录为基准；下载目标必须位于该目录内。修改后保存并应用配置。</p><div class="dialog-actions"><button type="button" class="danger secondary" id="profile-delete">删除配置</button><button type="submit">确认修改</button></div></form></dialog>
+<dialog id="auth-dialog"><form id="auth-form"><h2>连接服务</h2><p class="muted">如果服务启用了认证，请填写 KIMODO_API_TOKEN。</p><label>API 令牌<input id="api-token" type="password" autocomplete="off"></label><p class="hint">令牌只保留在当前页面内存中，刷新页面后需重新填写。</p><div class="dialog-actions"><button type="button" id="auth-close" class="secondary">关闭</button><button>连接</button></div></form></dialog>
+</body></html>

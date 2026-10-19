@@ -1,0 +1,161 @@
+{
+  "host": "127.0.0.1",
+  "port": 6600,
+  "device": "cuda",
+  "models_dir": "../models",
+  "data_dir": "data",
+  "default_model": "soma-fp32",
+  "offload": true,
+  "tf32": false,
+  "cpu_threads": 4,
+  "queue_size": 8,
+  "retention_hours": 168,
+  "default_encoder": "awq",
+  "encoders": {
+    "awq": {
+      "label": "Public AWQ Llama 3 + LLM2Vec (approximate)",
+      "kind": "awq_llm2vec",
+      "base": "text_encoders/llama-3-8b-instruct-awq",
+      "mntp": "text_encoders/LLM2Vec-Meta-Llama-3-8B-Instruct-mntp",
+      "supervised": "text_encoders/LLM2Vec-Meta-Llama-3-8B-Instruct-mntp-supervised",
+      "block_swap": 0,
+      "repo_id": "casperhansen/llama-3-8b-instruct-awq",
+      "mntp_repo_id": "McGill-NLP/LLM2Vec-Meta-Llama-3-8B-Instruct-mntp",
+      "supervised_repo_id": "McGill-NLP/LLM2Vec-Meta-Llama-3-8B-Instruct-mntp-supervised",
+      "download_source": "huggingface"
+    },
+    "nf4": {
+      "label": "Aero-Ex NF4 LLM2Vec (original plugin)",
+      "kind": "nf4_llm2vec",
+      "base": "text_encoders/KIMODO-Meta3_llm2vec_NF4",
+      "mntp": null,
+      "supervised": null,
+      "block_swap": 0,
+      "repo_id": "Aero-Ex/KIMODO-Meta3_llm2vec_NF4",
+      "mntp_repo_id": null,
+      "supervised_repo_id": null,
+      "download_source": "huggingface"
+    },
+    "bf16": {
+      "label": "Original BF16 Llama 3 + LLM2Vec",
+      "kind": "llm2vec",
+      "base": "text_encoders/Meta-Llama-3-8B-Instruct",
+      "mntp": "text_encoders/LLM2Vec-Meta-Llama-3-8B-Instruct-mntp",
+      "supervised": "text_encoders/LLM2Vec-Meta-Llama-3-8B-Instruct-mntp-supervised",
+      "block_swap": 24,
+      "repo_id": "meta-llama/Meta-Llama-3-8B-Instruct",
+      "mntp_repo_id": "McGill-NLP/LLM2Vec-Meta-Llama-3-8B-Instruct-mntp",
+      "supervised_repo_id": "McGill-NLP/LLM2Vec-Meta-Llama-3-8B-Instruct-mntp-supervised",
+      "download_source": "huggingface"
+    }
+  },
+  "block_swap": 0,
+  "models": {
+    "soma-fp32": {
+      "label": "Kimodo SOMA v1.2 · FP32",
+      "path": "Kimodo-SOMA-RP-v1.2",
+      "precision": "fp32",
+      "skeleton": "SOMA",
+      "repo_id": "nvidia/Kimodo-SOMA-RP-v1.2",
+      "download_source": "huggingface"
+    },
+    "soma-fp16": {
+      "label": "Kimodo SOMA v1.2 · FP16",
+      "path": "Kimodo-SOMA-RP-v1.2",
+      "precision": "fp16",
+      "skeleton": "SOMA",
+      "repo_id": "nvidia/Kimodo-SOMA-RP-v1.2",
+      "download_source": "huggingface"
+    },
+    "soma-bf16": {
+      "label": "Kimodo SOMA v1.2 · BF16",
+      "path": "Kimodo-SOMA-RP-v1.2",
+      "precision": "bf16",
+      "skeleton": "SOMA",
+      "repo_id": "nvidia/Kimodo-SOMA-RP-v1.2",
+      "download_source": "huggingface"
+    },
+    "soma-int8": {
+      "label": "Kimodo SOMA v1.2 · ConvRot INT8",
+      "path": "Kimodo-SOMA-RP-v1.2-int8-convrot",
+      "precision": "int8_convrot",
+      "skeleton": "SOMA",
+      "repo_id": "spawner/Kimodo-SOMA-RP-v1.2-int8-convrot",
+      "download_source": "modelscope"
+    },
+    "soma-rp-v1": {
+      "label": "Kimodo-SOMA-RP-v1 · FP32",
+      "path": "Kimodo-SOMA-RP-v1",
+      "precision": "fp32",
+      "skeleton": "SOMA",
+      "repo_id": "nvidia/Kimodo-SOMA-RP-v1",
+      "download_source": "huggingface"
+    },
+    "soma-rp-v1.1": {
+      "label": "Kimodo-SOMA-RP-v1.1 · FP32",
+      "path": "Kimodo-SOMA-RP-v1.1",
+      "precision": "fp32",
+      "skeleton": "SOMA",
+      "repo_id": "nvidia/Kimodo-SOMA-RP-v1.1",
+      "download_source": "huggingface"
+    },
+    "soma-ardy-v1.2": {
+      "label": "Kimodo-SOMA-RP-ArdyRep-v1.2 · FP32",
+      "path": "Kimodo-SOMA-RP-ArdyRep-v1.2",
+      "precision": "fp32",
+      "skeleton": "SOMA",
+      "repo_id": "nvidia/Kimodo-SOMA-RP-ArdyRep-v1.2",
+      "download_source": "huggingface"
+    },
+    "smplx-rp-v1": {
+      "label": "Kimodo-SMPLX-RP-v1 · FP32",
+      "path": "Kimodo-SMPLX-RP-v1",
+      "precision": "fp32",
+      "skeleton": "SMPLX",
+      "repo_id": "nvidia/Kimodo-SMPLX-RP-v1",
+      "download_source": "huggingface"
+    },
+    "g1-rp-v1": {
+      "label": "Kimodo-G1-RP-v1 · FP32",
+      "path": "Kimodo-G1-RP-v1",
+      "precision": "fp32",
+      "skeleton": "G1",
+      "repo_id": "nvidia/Kimodo-G1-RP-v1",
+      "download_source": "huggingface"
+    },
+    "soma-seed-v1": {
+      "label": "Kimodo-SOMA-SEED-v1 · FP32",
+      "path": "Kimodo-SOMA-SEED-v1",
+      "precision": "fp32",
+      "skeleton": "SOMA",
+      "repo_id": "nvidia/Kimodo-SOMA-SEED-v1",
+      "download_source": "huggingface"
+    },
+    "soma-seed-v1.1": {
+      "label": "Kimodo-SOMA-SEED-v1.1 · FP32",
+      "path": "Kimodo-SOMA-SEED-v1.1",
+      "precision": "fp32",
+      "skeleton": "SOMA",
+      "repo_id": "nvidia/Kimodo-SOMA-SEED-v1.1",
+      "download_source": "huggingface"
+    },
+    "g1-seed-v1": {
+      "label": "Kimodo-G1-SEED-v1 · FP32",
+      "path": "Kimodo-G1-SEED-v1",
+      "precision": "fp32",
+      "skeleton": "G1",
+      "repo_id": "nvidia/Kimodo-G1-SEED-v1",
+      "download_source": "huggingface"
+    }
+  },
+  "inference": {
+    "seed": 42,
+    "steps": 100,
+    "transition_frames": 5,
+    "cfg_text": 2.0,
+    "cfg_constraints": 2.0,
+    "post_processing": false,
+    "standard_tpose": true,
+    "output_format": "bvh"
+  }
+}
