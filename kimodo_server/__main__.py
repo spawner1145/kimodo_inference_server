@@ -63,6 +63,8 @@ def comparison(config,args):
 
 
 def main():
+    from . import check_bundled_core
+    check_bundled_core()
     parser = argparse.ArgumentParser(description='Kimodo motion inference service and quantization tools')
     commands = parser.add_subparsers(dest='command',required=True)
     serve = commands.add_parser('serve',help='Start the HTTP inference API')

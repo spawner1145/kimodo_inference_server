@@ -4,7 +4,7 @@ build-backend = "setuptools.build_meta"
 
 [project]
 name = "kimodo-inference-server"
-version = "0.3.0"
+version = "0.3.1"
 description = "Local Kimodo v1.2 motion inference API with optional ConvRot INT8"
 requires-python = ">=3.10"
 license = {text = "Apache-2.0"}
@@ -18,7 +18,8 @@ test = ["httpx>=0.27"]
 nf4 = ["bitsandbytes>=0.43.3", "accelerate>=0.26"]
 
 [tool.setuptools.packages.find]
-include = ["kimodo_server*"]
+include = ["kimodo_server*", "kimodo", "kimodo.*"]
 
 [tool.setuptools.package-data]
 kimodo_server = ["web/*.html", "web/*.css", "web/*.js"]
+kimodo = ["LICENSE", "ATTRIBUTIONS.MD", "assets/skeletons/**/*"]

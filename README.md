@@ -1,10 +1,10 @@
 # Kimodo 推理服务
 
-独立 HTTP 服务，支持 Kimodo 的 SOMA、SMPL-X、G1 动作模型。Blender 不加载 PyTorch 或模型，只连接 API、提交任务并下载动画。服务端与插件可放在不同电脑上。模型文件通过配置引用，不复制到代码目录。
+独立 HTTP 服务，支持 Kimodo 的 SOMA、SMPL-X、G1 动作模型。Blender 不加载 PyTorch 或模型，只连接 API、提交任务并下载动画。服务端与插件可放在不同电脑上。上游推理源码、骨架静止姿态资源和 LLM2Vec 代码已内置在本文件夹的 `kimodo/` 中，无需另外克隆或安装 Kimodo / ConvRot 仓库。模型默认下载到本服务端的 `models/`。
 
 ## 安装环境
 
-推荐 **64 位 Python 3.12**，最低 Python 3.10。Python 可从 [官网](https://www.python.org/downloads/) 安装；GPU 推理需要 NVIDIA GPU 和兼容的显卡驱动。以下命令均在 `inference_server` 目录执行。
+推荐 **64 位 Python 3.12**，最低 Python 3.10。Python 可从 [官网](https://www.python.org/downloads/) 安装；GPU 推理需要 NVIDIA GPU 和兼容的显卡驱动。以下命令均在 `kimodo_inference_server` 目录执行。
 
 **支持全局 Python 和虚拟环境，不强制创建或激活虚拟环境。** 两种方式安装相同依赖、使用相同配置。全局安装与该 Python 的其他项目共享依赖，虚拟环境则单独存放依赖；下面第 1 步任选一种，然后继续第 2–5 步。
 
@@ -17,7 +17,7 @@
 Windows PowerShell（选择已安装的 Python 3.12）：
 
 ```powershell
-cd D:\code\kimodo\inference_server
+cd C:\your-project\kimodo_inference_server
 $env:KIMODO_PYTHON = (py -3.12 -c "import sys; print(sys.executable)").Trim()
 & $env:KIMODO_PYTHON -m pip install --upgrade pip setuptools wheel
 ```
@@ -29,7 +29,7 @@ Windows CMD 对应写法为 `set "KIMODO_PYTHON=C:\Python312\python.exe"`，随�
 Linux / macOS（先退出已激活的虚拟环境）：
 
 ```sh
-cd /path/to/inference_server
+cd /path/to/kimodo_inference_server
 export KIMODO_PYTHON="$(python3 -c 'import sys; print(sys.executable)')"
 "$KIMODO_PYTHON" -m pip install --upgrade pip setuptools wheel
 ```
@@ -43,18 +43,18 @@ export KIMODO_PYTHON="$(python3 -c 'import sys; print(sys.executable)')"
 Windows PowerShell：
 
 ```powershell
-cd D:\code\kimodo\inference_server
+cd C:\your-project\kimodo_inference_server
 py -3.12 -m venv .venv
 .\.venv\Scripts\Activate.ps1
 python -m pip install --upgrade pip setuptools wheel
 ```
 
-如果使用 Windows CMD，激活命令是 `.venv\Scripts\activate.bat`。也可以不激活，把后续命令里的 `python` 换成 `.\.venv\Scripts\python.exe`，这样无需调整 PowerShell 执行策略。已有合适的虚拟环境时直接使用，无需再建一个；本机现有环境在相邻的 `.venv-nvfp4`。
+如果使用 Windows CMD，激活命令是 `.venv\Scripts\activate.bat`。也可以不激活，把后续命令里的 `python` 换成 `.\.venv\Scripts\python.exe`，这样无需调整 PowerShell 执行策略。已有合适的虚拟环境时直接使用，无需再建一个。
 
 Linux / macOS：
 
 ```sh
-cd /path/to/inference_server
+cd /path/to/kimodo_inference_server
 python3 -m venv .venv
 . .venv/bin/activate
 python -m pip install --upgrade pip setuptools wheel
@@ -98,40 +98,29 @@ python -m pip install -r requirements.txt
 
 Windows / Linux 默认包含 NF4 所需的 bitsandbytes，macOS 通过平台条件跳过。NF4 完整模型仍需后续下载；安装依赖不下载模型权重。依赖版本下限不代表所有未来版本都已验证兼容；本机使用 Transformers 5.1.0 完成过验证，升级后如遇上游内部 API 变化，需要相应适配。
 
-### 4. 安装 Kimodo 核心和本服务
+### 4. 检查内置核心（可选安装命令）
 
-本文件只列推理所需依赖，Kimodo 核心代码需要单独安装。上游完整依赖含演示界面和自身的固定版本声明，下面使用 `--no-deps`，由本项目的 requirements 管理推理依赖；`SKIP_MOTION_CORRECTION_IN_SETUP=1` 跳过可选 C++ 后处理编译。
+执行完 requirements 安装后，即可从本目录直接运行 `start.bat` / `start.sh` 或 `python -m kimodo_server`。**不要另装 Kimodo，也不需要父目录源码、Git 或子模块。**
 
-如果服务端目录旁就是官方 Kimodo 源码（本机当前目录结构即如此），在 Windows PowerShell 执行：
+```sh
+python -c "import kimodo_server; kimodo_server.check_bundled_core(); import kimodo; print('Bundled core:', kimodo.__file__)"
+```
 
-```powershell
-$env:SKIP_MOTION_CORRECTION_IN_SETUP='1'
-python -m pip install --no-deps --no-build-isolation -e ..
+输出应指向当前服务端文件夹中的 `kimodo/__init__.py`。如需安装 `kimodo-server` 命令，也可在本目录执行：
+
+```sh
 python -m pip install --no-deps --no-build-isolation -e .
 ```
 
-Linux / macOS：
+本服务的包配置会同时安装内置 `kimodo` 核心、骨架资源和 `kimodo_server`。上游来源、许可及裁剪范围见 `ATTRIBUTIONS.md`。
+
+普通推理无需 C++ 编译器。可选的 `motion_correction` 后处理源码也保存在 `native/MotionCorrection/`，默认不编译；如果需要启用，先按其 README 安装 C++17 编译器、CMake、pybind11 和 Eigen3，再从服务端目录执行：
 
 ```sh
-export SKIP_MOTION_CORRECTION_IN_SETUP=1
-python -m pip install --no-deps --no-build-isolation -e ..
-python -m pip install --no-deps --no-build-isolation -e .
+python -m pip install --no-deps --no-build-isolation ./native/MotionCorrection
 ```
 
-**如果只拿到了独立的服务端文件夹**，父目录不是 Kimodo 源码，把上面的 `-e ..` 安装命令换成以下命令（同样先设置 `SKIP_MOTION_CORRECTION_IN_SETUP=1`）：
-
-```sh
-python -m pip install --no-deps --no-build-isolation "https://github.com/nv-tlabs/kimodo/archive/e1c219c99b4b94ba48be1fb6a1cbc64ecee4c954.zip"
-python -m pip install --no-deps --no-build-isolation -e .
-```
-
-这是 NVIDIA 官方仓库的源码提交，与库版本上限无关，不需要安装 Git。网络无法访问 GitHub 时，也可从该仓库下载并解压源码，再把安装命令的 URL 替换为解压后的本地目录。跳过后处理时不需要 CMake 或 C++ 编译器；想使用 `motion_correction` 的用户按 Kimodo 官方文档另行编译安装。
-
-检查基础推理和文本编码器代码能否加载：
-
-```sh
-python -c "import torch, kimodo, kimodo_server; from kimodo_server.runtime import MotionRuntime; from kimodo.model.llm2vec.models.bidirectional_llama import LlamaBiModel; print('Imports OK; CUDA:', torch.cuda.is_available())"
-```
+构建过程不会自动克隆第三方仓库；缺少 C++ 依赖会明确报错。尚未编译时保持“动作后处理”关闭，其余生成、量化和块交换功能均可用。
 
 ### 5. 配置模型并启动
 
@@ -153,7 +142,7 @@ WebUI 和命令行下载均使用同一个 `models_dir`，模型加载也从这�
 
 Windows 双击 **`start.bat`**；Linux / macOS 执行 **`sh start.sh`**。启动后打开 **http://127.0.0.1:6600/**，API 文档在 `/docs`，按 Ctrl+C 停止。启动脚本不安装依赖、不自动下载模型；已有服务运行时无需重复启动。
 
-两个脚本都从自身目录读取 `config.json`，不受工作目录影响；按顺序选择 `KIMODO_PYTHON` 指定的解释器、已激活虚拟环境、服务端目录的 `.venv`、相邻 `.venv-nvfp4`、相邻 `.venv`，最后使用 PATH 中的 Python（Windows 为 `python`，Linux / macOS 优先 `python3`）。因此没有虚拟环境时，也能直接使用全局 Python；希望忽略旁边已有的虚拟环境时，设置 `KIMODO_PYTHON` 为全局解释器的完整路径。脚本会显示实际使用的 Python。Linux 也可先 `chmod +x start.sh` 再执行 `./start.sh`。
+两个脚本都从自身目录读取 `config.json`，不受工作目录影响；按顺序选择 `KIMODO_PYTHON` 指定的解释器、已激活虚拟环境、服务端目录的 `.venv`，最后使用 PATH 中的 Python（Windows 为 `python`，Linux / macOS 优先 `python3`）。因此没有虚拟环境时，也能直接使用全局 Python；希望明确选择全局 Python 时，设置 `KIMODO_PYTHON` 为全局解释器的完整路径。脚本会显示实际使用的 Python。Linux 也可先 `chmod +x start.sh` 再执行 `./start.sh`。
 
 支持追加参数，例如 `start.bat --port 6601` 或 `sh start.sh --port 6601`。自定义解释器时，Windows PowerShell 使用 `$env:KIMODO_PYTHON='C:\path\to\python.exe'`，Linux 使用 `KIMODO_PYTHON=/path/to/python sh start.sh`。只填写解释器路径，不附带参数。Windows 启动失败会保留窗口显示错误，自动化调用可设置 `KIMODO_NO_PAUSE=1`。
 
@@ -177,7 +166,7 @@ python -m kimodo_server serve --config config.json
 
 启用 `KIMODO_API_TOKEN` 后，在面板左下角填写相同 API 令牌。令牌只保留在页面内存中；刷新或跳到新端口需重新填写。下载令牌不写配置文件或任务信息，可留空使用服务进程中对应的 `HF_TOKEN` / `MODELSCOPE_API_TOKEN`，两类下载凭据分开使用。对外监听前需在服务进程环境设置 API 令牌并重新启动服务。
 
-迁移到其他目录或机器：在可运行 NVIDIA Kimodo v1.2 的 Python 环境中执行 `pip install -e .`，修改 `config.json` 的 `models_dir`、编码器路径和模型配置。运行时需要 CUDA PyTorch、Kimodo、Transformers、PEFT、Accelerate、bvhio 及它们的依赖；本包不替换已有 CUDA PyTorch。只安装核心 Kimodo、暂不编译可选后处理时，可按上游约定设置 `SKIP_MOTION_CORRECTION_IN_SETUP=1`。当前本机没有 `motion_correction`，默认关闭动作后处理；API 会明确拒绝需要此扩展的请求。
+迁移到其他目录或机器：复制整个服务端文件夹，按上面的步骤安装 PyTorch 和 requirements，然后启动。所有推理源码随包提供，不读取旧工作区或旁边的 Kimodo 文件夹。模型可复制到本包 `models/`，也可通过 WebUI 重新下载；虚拟环境请在新位置重新创建，或选择已有全局 Python。配置路径优先使用相对路径。
 
 跨机器访问：将 `host` 改为服务端网卡地址或 `0.0.0.0`，先设置 `$env:KIMODO_API_TOKEN='你自己的令牌'`，在 Blender 中填写相同令牌。按需配置系统防火墙；公网使用带 TLS 的反向代理。令牌只从服务进程环境读取，不写入配置文件。
 
@@ -197,6 +186,17 @@ python -m kimodo_server serve --config config.json
 - 取消请求会在扩散步之间检查，文本编码或模型加载阶段会在该阶段完成后响应。取消任务不会产生可下载的成功结果。
 
 缓存、生成文件和日志放在 `data/`，不散落到源码或系统临时模型目录。生成结果默认保留 168 小时，由 `retention_hours` 控制。服务重启后任务查询表会重建，缓存仍保留。
+
+### 独立部署检查
+
+在服务端目录运行：
+
+```sh
+python tests/standalone_check.py
+python tests/standalone_check.py --infer
+```
+
+检查会把源码复制到临时位置，禁止联网和读取原工作区的源码、模型，验证内置文本编码器代码及 SOMA/SMPLX/G1 骨架导出。`--infer` 需要本地已有 SOMA v1.2 和 NF4 编码器权重，还会实际运行 NF4 文本编码、BF16 动作生成、块交换和 BVH 导出。模型使用临时硬链接，不复制数 GB 数据；运行后清理临时目录。这验证部署完整性，不是生成质量评测。
 
 ### FP16 / BF16 动作推理
 

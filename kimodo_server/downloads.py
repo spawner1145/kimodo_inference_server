@@ -190,12 +190,14 @@ def download_worker(items,endpoint):
                 snapshot_download(model_id=item['repo'],local_dir=str(dest),
                                   endpoint='https://www.modelscope.cn',
                                   token=os.environ.get('MODELSCOPE_API_TOKEN') or None,
-                                  max_workers=4)
+                                  max_workers=4,
+                                  ignore_patterns=['*.py','*.pyc','*.ipynb','*.sh','*.bat','*.cmd','*.ps1','*.exe'])
             else:
                 from huggingface_hub import snapshot_download
                 snapshot_download(repo_id=item['repo'],local_dir=dest,endpoint=endpoint,
                                   token=os.environ.get('HF_TOKEN') or False,tqdm_class=Progress,
-                                  max_workers=4)
+                                  max_workers=4,
+                                  ignore_patterns=['*.py','*.pyc','*.ipynb','*.sh','*.bat','*.cmd','*.ps1','*.exe'])
             marker.unlink(missing_ok=True)
             emit(message='已完成 '+item['repo'],progress=(index+1)/len(items))
         emit(message='下载完成',progress=1)

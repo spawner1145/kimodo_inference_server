@@ -1,0 +1,4 @@
+include LICENSE ATTRIBUTIONS.md config.example.json requirements.txt start.bat start.sh README.md
+include kimodo/LICENSE kimodo/ATTRIBUTIONS.MD
+recursive-include kimodo/assets/skeletons *
+recursive-include native/MotionCorrection *.py *.cpp *.h *.inl *.txt *.md *.in LICENSE

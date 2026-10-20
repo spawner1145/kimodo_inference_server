@@ -1,47 +1,93 @@
+# Python environments and bytecode
+.venv/
+.venv-*/
+/venv/
+/env/
+/ENV/
 __pycache__/
 *.py[cod]
-*.egg-info/
+*$py.class
+.Python
+
+# Package builds, native binaries and release archives
 build/
 dist/
-data/
-.venv/
-
-# Environments, caches and development tools
-.venv-*/
-venv/
-env/
+*.egg-info/
 .eggs/
+*.egg
+*.whl
+*.pyd
+*.dll
+*.so
+*.dylib
+*.o
+*.a
+*.lib
+*.exe
+*.zip
+*.7z
+*.rar
+*.tar
+*.tar.gz
+*.tgz
+
+# Development caches and editor / OS files
 .pytest_cache/
 .ruff_cache/
 .mypy_cache/
+.hypothesis/
+.tox/
+.nox/
+.ipynb_checkpoints/
 .coverage
 .coverage.*
 htmlcov/
-.tox/
-.nox/
 .idea/
 .vscode/
+.vs/
 .DS_Store
 Thumbs.db
+Desktop.ini
+*.swp
+*.swo
+*~
 
-# Machine settings and credentials (publish config.example.json)
+# Machine configuration and credentials; publish examples instead
 /config.json
 /config.local*.json
 /config.json.*.tmp
+/credentials*.json
+/secrets*.json
+/tokens*.json
 .env
 .env.*
 !.env.example
+.netrc
+.pypirc
 *.pem
 *.key
 
-# Downloaded models, caches, generated animations and release archives
+# Runtime directories (root-only: bundled source has models/data packages)
 /models/
 /checkpoints/
+/data/
+/data-*/
 /outputs/
 /backups/
-/.cache/
-/.modelscope/
-/.huggingface/
+/logs/
+/reports/
+/runs/
+/wandb/
+
+# Download / framework caches, at any depth
+.cache/
+.huggingface/
+.modelscope/
+.torch/
+.hf/
+.kimodo-downloading
+
+# Weights and generated motion / scene / video files
 *.safetensors
 *.pt
 *.pth
@@ -49,14 +95,44 @@ Thumbs.db
 *.bin
 *.onnx
 *.gguf
-.kimodo-downloading
+*.h5
+*.hdf5
+*.npy
+*.npz
+*.p
+*.pkl
+*.pickle
+*.bvh
+*.fbx
+*.blend
+*.blend[0-9]*
+*.mp4
+*.mov
+*.mkv
+*.avi
+*.webm
+*.m4v
+
+# Logs, interrupted downloads and temporary / backup files
 *.log
 *.tmp
 *.part
-*.blend
-*.blend[0-9]*
-*.bvh
-*.zip
-*.7z
-*.tar
-*.tar.gz
+*.incomplete
+*.bak
+*.orig
+*.rej
+
+# Required upstream bind skeleton assets; keep these in the source distribution.
+!/kimodo/assets/skeletons/g1skel34/joints.p
+!/kimodo/assets/skeletons/g1skel34/rest_pose_local_rot.p
+!/kimodo/assets/skeletons/smplx22/beta.npy
+!/kimodo/assets/skeletons/smplx22/joints.p
+!/kimodo/assets/skeletons/smplx22/mean_hands.npy
+!/kimodo/assets/skeletons/somaskel30/joints.p
+!/kimodo/assets/skeletons/somaskel30/soma_base_fit_mhr_params.npz
+!/kimodo/assets/skeletons/somaskel77/bvh_joints.p
+!/kimodo/assets/skeletons/somaskel77/joints.p
+!/kimodo/assets/skeletons/somaskel77/relaxed_hands_rest_pose.npy
+!/kimodo/assets/skeletons/somaskel77/skin_standard.npz
+!/kimodo/assets/skeletons/somaskel77/somaskel77_standard_tpose.bvh
+!/kimodo/assets/skeletons/somaskel77/standard_t_pose_global_offsets_rots.p

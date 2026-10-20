@@ -9,7 +9,7 @@ if [ -z "$KIMODO_LAUNCH_PYTHON" ] && [ -n "${VIRTUAL_ENV:-}" ] && [ -x "$VIRTUAL
     KIMODO_LAUNCH_PYTHON="$VIRTUAL_ENV/bin/python"
 fi
 if [ -z "$KIMODO_LAUNCH_PYTHON" ]; then
-    for candidate in "$SCRIPT_DIR/.venv/bin/python" "$SCRIPT_DIR/../.venv-nvfp4/bin/python" "$SCRIPT_DIR/../.venv/bin/python"; do
+    for candidate in "$SCRIPT_DIR/.venv/bin/python"; do
         if [ -x "$candidate" ]; then
             KIMODO_LAUNCH_PYTHON=$candidate
             break
@@ -26,7 +26,7 @@ fi
 
 export PYTHONUTF8=1 PYTHONDONTWRITEBYTECODE=1
 printf 'Python: %s\n' "$KIMODO_LAUNCH_PYTHON"
-if ! "$KIMODO_LAUNCH_PYTHON" -c "import sys; assert sys.version_info >= (3, 10), 'Python 3.10+ is required'; import fastapi, uvicorn, torch, kimodo, kimodo_server"; then
+if ! "$KIMODO_LAUNCH_PYTHON" -c "import sys; assert sys.version_info >= (3, 10), 'Python 3.10+ is required'; import kimodo_server; kimodo_server.check_bundled_core(); import fastapi, uvicorn, torch, kimodo"; then
     printf '\n[ERROR] Python or the Kimodo server dependencies are unavailable.\n' >&2
     printf 'Set KIMODO_PYTHON to a global or virtual environment Python with the dependencies installed.\nSee README.md for setup. Nothing was installed or downloaded.\n' >&2
     exit 1

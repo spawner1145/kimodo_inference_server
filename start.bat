@@ -10,16 +10,13 @@ if defined VIRTUAL_ENV if exist "%VIRTUAL_ENV%\Scripts\python.exe" set "_KIMODO_
 if defined _KIMODO_PYTHON goto python_ready
 if exist "%~dp0.venv\Scripts\python.exe" set "_KIMODO_PYTHON=%~dp0.venv\Scripts\python.exe"
 if defined _KIMODO_PYTHON goto python_ready
-if exist "%~dp0..\.venv-nvfp4\Scripts\python.exe" set "_KIMODO_PYTHON=%~dp0..\.venv-nvfp4\Scripts\python.exe"
-if defined _KIMODO_PYTHON goto python_ready
-if exist "%~dp0..\.venv\Scripts\python.exe" set "_KIMODO_PYTHON=%~dp0..\.venv\Scripts\python.exe"
 if not defined _KIMODO_PYTHON set "_KIMODO_PYTHON=python"
 
 :python_ready
 set "PYTHONUTF8=1"
 set "PYTHONDONTWRITEBYTECODE=1"
 echo Python: "%_KIMODO_PYTHON%"
-"%_KIMODO_PYTHON%" -c "import sys; assert sys.version_info >= (3, 10), 'Python 3.10+ is required'; import fastapi, uvicorn, torch, kimodo, kimodo_server"
+"%_KIMODO_PYTHON%" -c "import sys; assert sys.version_info >= (3, 10), 'Python 3.10+ is required'; import kimodo_server; kimodo_server.check_bundled_core(); import fastapi, uvicorn, torch, kimodo"
 if errorlevel 1 goto environment_error
 
 echo Starting Kimodo. Default WebUI: http://127.0.0.1:6600/

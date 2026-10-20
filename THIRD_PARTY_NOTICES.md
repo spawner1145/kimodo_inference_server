@@ -1,9 +1,10 @@
 # Sources and licenses
 
 This service's integration code is distributed under Apache-2.0; see LICENSE.
-It depends on an installed NVIDIA Kimodo package rather than bundling its code
-or model weights. NVIDIA Kimodo source uses Apache-2.0; downloaded weights
-retain their own model licenses.
+NVIDIA Kimodo inference source and bind skeleton assets are bundled in
+`kimodo/`; see `ATTRIBUTIONS.md`, `kimodo/LICENSE` and `kimodo/ATTRIBUTIONS.MD`.
+No separate Kimodo repository/package is required. Model weights remain
+separate downloads and retain their own model licenses.
 
 The persistent-process, embedding-cache and staged-offload design was studied
 from Lewdineer's Kimodo Blender Bridge and Aero-Ex/kimodo. The service HTTP
